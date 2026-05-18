@@ -329,6 +329,76 @@ body {
 /* ── CONTRIB NOTE ── */
 .contrib-note { font-size:.85rem; color:var(--muted); margin-bottom:1rem; background:var(--surface2); padding:.65rem .9rem; border-radius:8px; }
 
+/* ── START HERE ── */
+.start-hero {
+  background: linear-gradient(135deg, var(--green-pale) 0%, #fff 100%);
+  border: 2px solid #bbf7d0;
+  border-radius: var(--radius);
+  padding: 2rem 1.75rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.start-hero-logo { font-size: 2.2rem; font-weight: 900; color: var(--green); margin-bottom: .35rem; }
+.start-hero-logo span { color: var(--text); }
+.start-hero-sub  { font-size: .95rem; color: var(--muted); margin-bottom: 1.25rem; }
+.start-steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.start-step {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow);
+}
+.start-step-icon { font-size: 1.75rem; margin-bottom: .5rem; }
+.start-step-title { font-size: .9rem; font-weight: 800; margin-bottom: .3rem; }
+.start-step-desc  { font-size: .8rem; color: var(--muted); line-height: 1.55; }
+.save-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+}
+.save-card-title { font-size: 1rem; font-weight: 800; margin-bottom: .35rem; }
+.save-card-desc  { font-size: .83rem; color: var(--muted); margin-bottom: 1.1rem; line-height: 1.6; }
+.save-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 640px) { .save-grid { grid-template-columns: 1fr; } }
+.save-option {
+  background: var(--surface2);
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.save-option-title { font-size: .88rem; font-weight: 800; margin-bottom: .4rem; }
+.save-option-desc  { font-size: .78rem; color: var(--muted); margin-bottom: .9rem; line-height: 1.55; }
+.save-option ol    { font-size: .78rem; color: var(--muted); padding-left: 1.1rem; margin-bottom: .9rem; line-height: 1.8; }
+.save-option ol li { margin-bottom: .1rem; }
+.alert-note {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  font-size: .8rem;
+  color: #92400e;
+  margin-bottom: 1rem;
+}
+.gdrive-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+.gdrive-steps { font-size: .82rem; color: var(--muted); padding-left: 1.2rem; line-height: 2; }
+body.dark .start-hero  { background: linear-gradient(135deg, #052e16 0%, #1f2937 100%); border-color: #14532d; }
+body.dark .start-step  { background: #1f2937; border-color: #374151; }
+body.dark .save-card   { background: #1f2937; border-color: #374151; }
+body.dark .save-option { background: #052e16; border-color: #14532d; }
+body.dark .alert-note  { background: #451a03; border-color: #92400e; color: #fcd34d; }
+body.dark .gdrive-card { background: #1f2937; border-color: #374151; }
+#import-file-input { display: none; }
+
 /* ── BILL SPLITTER ── */
 .bs-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
 @media (max-width:680px) { .bs-grid { grid-template-columns:1fr; } }
@@ -505,6 +575,7 @@ body.dark .tx-del:hover   { color:#fca5a5; }
 
 <!-- NAV -->
 <nav class="app-nav">
+  <button class="nav-tab" onclick="showTab('start')">🚀 Start Here</button>
   <button class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
   <button class="nav-tab" onclick="showTab('transactions')">💳 Transactions</button>
   <button class="nav-tab" onclick="showTab('budget')">📋 Budget</button>
@@ -514,6 +585,98 @@ body.dark .tx-del:hover   { color:#fca5a5; }
 </nav>
 
 <main class="app-main">
+
+  <!-- ════ START HERE ════ -->
+  <section id="tab-start" class="tab-panel">
+
+    <div class="start-hero">
+      <div class="start-hero-logo">money<span>Cents</span></div>
+      <div class="start-hero-sub">Track it. Save it. Own it. — No account needed. All your data stays on your device.</div>
+      <button class="btn btn-green" onclick="showTab('dashboard')">Go to Dashboard →</button>
+    </div>
+
+    <div class="start-steps">
+      <div class="start-step">
+        <div class="start-step-icon">💳</div>
+        <div class="start-step-title">Log Transactions</div>
+        <div class="start-step-desc">Go to the Transactions tab and tap <strong>+ Add Transaction</strong> to log income or expenses by category.</div>
+      </div>
+      <div class="start-step">
+        <div class="start-step-icon">📋</div>
+        <div class="start-step-title">Set a Budget</div>
+        <div class="start-step-desc">Head to the Budget tab to set monthly spending limits. The app will warn you when you're getting close.</div>
+      </div>
+      <div class="start-step">
+        <div class="start-step-icon">🎯</div>
+        <div class="start-step-title">Create a Goal</div>
+        <div class="start-step-desc">Use the Goals tab to track a savings target — vacation fund, emergency fund, new car, anything.</div>
+      </div>
+      <div class="start-step">
+        <div class="start-step-icon">💾</div>
+        <div class="start-step-title">Back Up Your Data</div>
+        <div class="start-step-desc">Export a backup file below and save it to your desktop or Google Drive so you never lose your data.</div>
+      </div>
+    </div>
+
+    <!-- HOW DATA IS SAVED -->
+    <div class="save-card" style="margin-bottom:1rem;">
+      <div class="save-card-title">How your data is saved</div>
+      <div class="save-card-desc">
+        moneyCents has no server or account — your data is saved automatically in your browser's <strong>localStorage</strong>,
+        a private storage area built into every modern browser. It saves every time you make a change and never leaves your device.
+      </div>
+      <div class="alert-note">
+        ⚠️ <strong>Important:</strong> If you clear your browser history or browser data, your moneyCents data will be erased.
+        Export a backup file regularly to protect your data.
+      </div>
+    </div>
+
+    <!-- EXPORT / IMPORT -->
+    <div class="save-grid" style="margin-bottom:1.5rem;">
+
+      <div class="save-option">
+        <div class="save-option-title">⬇️ Export — Save to Desktop</div>
+        <div class="save-option-desc">Download all your data as a <code>.json</code> backup file. Keep it on your Desktop, in a Documents folder, or on a USB drive.</div>
+        <ol>
+          <li>Click the button below</li>
+          <li>A file named <code>moneycents-backup-[date].json</code> will download</li>
+          <li>Move it to a safe place on your computer</li>
+        </ol>
+        <button class="btn btn-green" onclick="exportData()">⬇️ Export Data (Download)</button>
+      </div>
+
+      <div class="save-option">
+        <div class="save-option-title">📂 Import — Restore a Backup</div>
+        <div class="save-option-desc">Restore your data from a previously exported <code>.json</code> file. This will replace your current data.</div>
+        <ol>
+          <li>Click the button below</li>
+          <li>Select your <code>moneycents-backup.json</code> file</li>
+          <li>Your data will be restored immediately</li>
+        </ol>
+        <input type="file" id="import-file-input" accept=".json" onchange="importData(event)">
+        <button class="btn btn-ghost" onclick="document.getElementById('import-file-input').click()">📂 Import Data (Restore)</button>
+      </div>
+
+    </div>
+
+    <!-- GOOGLE DRIVE -->
+    <div class="gdrive-card">
+      <div class="save-card-title" style="margin-bottom:.35rem;">☁️ Saving to Google Drive</div>
+      <div class="save-card-desc">
+        You can keep a copy of your backup in Google Drive for extra safety. No special setup required — just export and upload.
+      </div>
+      <ol class="gdrive-steps">
+        <li>Click <strong>Export Data (Download)</strong> above to download your backup file</li>
+        <li>Go to <strong>drive.google.com</strong> and sign in to your Google account</li>
+        <li>Drag and drop the <code>.json</code> file into your Drive, or click <strong>+ New → File upload</strong></li>
+        <li>To restore later: download the file from Drive, then click <strong>Import Data (Restore)</strong> above</li>
+      </ol>
+      <div style="font-size:.78rem;color:var(--muted);margin-top:.75rem;">
+        Tip: Create a folder called <strong>moneyCents Backups</strong> in your Drive to keep things organized.
+      </div>
+    </div>
+
+  </section>
 
   <!-- ════ DASHBOARD ════ -->
   <section id="tab-dashboard" class="tab-panel active">
@@ -884,7 +1047,7 @@ function inMonth(tx, ym) {
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
-const TAB_ORDER = ['dashboard', 'transactions', 'budget', 'goals', 'splitter', 'learn'];
+const TAB_ORDER = ['start', 'dashboard', 'transactions', 'budget', 'goals', 'splitter', 'learn'];
 
 function showTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -897,6 +1060,7 @@ function showTab(id) {
   if (id === 'goals')        renderGoals();
   if (id === 'splitter')     renderSplitter();
   if (id === 'learn')        renderLearn();
+  // 'start' tab is static, no render needed
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
@@ -1582,6 +1746,49 @@ function toggleConcept(i) {
   const body = document.getElementById(`cbody-${i}`);
   hdr.classList.toggle('open');
   body.classList.toggle('open');
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────────────────────────
+function exportData() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw || raw === '{}') {
+    alert('No data to export yet — add some transactions first!');
+    return;
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  const blob  = new Blob([raw], { type: 'application/json' });
+  const url   = URL.createObjectURL(blob);
+  const a     = document.createElement('a');
+  a.href      = url;
+  a.download  = `moneycents-backup-${today}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.transactions || !parsed.budgets || !parsed.goals) {
+        alert('This file does not look like a valid moneyCents backup. Please select the correct file.');
+        return;
+      }
+      if (!confirm('This will replace all your current data with the backup. Are you sure?')) return;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      data = loadData();
+      showTab('dashboard');
+      alert('✅ Data restored successfully!');
+    } catch {
+      alert('Could not read the file. Please make sure it is a valid moneyCents backup (.json).');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 // ── KEYBOARD ──────────────────────────────────────────────────────────────────
