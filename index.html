@@ -368,6 +368,69 @@ body {
 .bs-remaining.ok   { background:var(--green-pale); color:var(--green-dark); }
 .bs-remaining.warn { background:#fef3c7; color:#92400e; }
 .bs-remaining.over { background:var(--red-pale); color:var(--red); }
+
+/* ── FINANCIAL LITERACY ── */
+.fl-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; }
+@media (max-width:680px) { .fl-grid { grid-template-columns:1fr; } }
+
+.fl-snapshot-card {
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  background: #fff;
+}
+.fl-snapshot-label { font-size:.73rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:.25rem; }
+.fl-snapshot-rule  { font-size:.78rem; color:var(--muted); margin-bottom:.6rem; }
+.fl-snapshot-pcts  { display:flex; align-items:baseline; gap:.35rem; margin-bottom:.5rem; }
+.fl-actual         { font-size:1.7rem; font-weight:900; line-height:1; }
+.fl-target         { font-size:.78rem; color:var(--muted); }
+.fl-bar-track      { background:var(--border); border-radius:4px; height:8px; overflow:hidden; margin-bottom:.3rem; }
+.fl-bar-fill       { height:100%; border-radius:4px; transition:width .5s; }
+.fl-status         { font-size:.75rem; font-weight:600; }
+
+.calc-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; }
+@media (max-width:680px) { .calc-grid { grid-template-columns:1fr; } }
+
+.calc-result {
+  margin-top:1rem;
+  background: var(--surface2);
+  border: 1px solid #bbf7d0;
+  border-radius:8px;
+  padding:.85rem 1rem;
+}
+.calc-result-main  { font-size:1.6rem; font-weight:900; color:var(--green-dark); line-height:1; margin-bottom:.3rem; }
+.calc-result-sub   { font-size:.78rem; color:var(--muted); }
+.calc-result-row   { display:flex; justify-content:space-between; font-size:.8rem; margin-top:.4rem; }
+.calc-result-row span:last-child { font-weight:700; color:var(--text); }
+
+.concept-card { margin-bottom:.6rem; }
+.concept-hdr  {
+  display:flex; align-items:center; justify-content:space-between;
+  background:#fff; border:1px solid var(--border); border-radius:10px;
+  padding:.85rem 1rem; cursor:pointer; user-select:none;
+  transition: background .15s;
+}
+.concept-hdr:hover { background:var(--surface2); }
+.concept-hdr.open  { border-radius:10px 10px 0 0; border-bottom-color:transparent; background:var(--surface2); }
+.concept-title { font-size:.92rem; font-weight:700; }
+.concept-icon  { font-size:1rem; transition:transform .2s; }
+.concept-hdr.open .concept-icon { transform:rotate(180deg); }
+.concept-body  {
+  display:none; background:#fff;
+  border:1px solid var(--border); border-top:none;
+  border-radius:0 0 10px 10px;
+  padding:1rem 1.1rem;
+  font-size:.85rem; line-height:1.7; color:var(--text);
+}
+.concept-body.open { display:block; }
+.concept-body ul   { padding-left:1.2rem; margin:.4rem 0; }
+.concept-body li   { margin-bottom:.25rem; }
+.concept-highlight {
+  background:var(--green-pale); border-left:3px solid var(--green);
+  border-radius:0 6px 6px 0; padding:.5rem .85rem;
+  font-size:.82rem; margin:.6rem 0; font-weight:600; color:var(--green-dark);
+}
 </style>
 </head>
 <body>
@@ -385,6 +448,7 @@ body {
   <button class="nav-tab" onclick="showTab('budget')">📋 Budget</button>
   <button class="nav-tab" onclick="showTab('goals')">🎯 Goals</button>
   <button class="nav-tab" onclick="showTab('splitter')">🧾 Bill Splitter</button>
+  <button class="nav-tab" onclick="showTab('learn')">📚 Financial Literacy</button>
 </nav>
 
 <main class="app-main">
@@ -497,6 +561,120 @@ body {
       </div>
 
     </div>
+  </section>
+
+  <!-- ════ FINANCIAL LITERACY ════ -->
+  <section id="tab-learn" class="tab-panel">
+
+    <div class="sec-hdr" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="sec-title">Financial Literacy</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem;">Your money snapshot + calculators + key concepts</div>
+      </div>
+    </div>
+
+    <!-- 50/30/20 SNAPSHOT -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="sec-title" style="margin-bottom:.35rem;">Your 50/30/20 Snapshot</div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:1rem;">Based on this month's transactions in your account</div>
+      <div class="fl-grid" id="fl-snapshot"></div>
+    </div>
+
+    <!-- CALCULATORS -->
+    <div class="calc-grid">
+
+      <div class="card">
+        <div class="sec-title" style="margin-bottom:1rem;">📈 Compound Interest Calculator</div>
+        <div class="form-group">
+          <label class="form-label">Starting Amount ($)</label>
+          <input class="form-input" type="number" id="ci-principal" placeholder="1000" min="0" step="1" oninput="calcCompound()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly Contribution ($)</label>
+          <input class="form-input" type="number" id="ci-monthly" placeholder="100" min="0" step="1" oninput="calcCompound()">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Annual Rate (%)</label>
+            <input class="form-input" type="number" id="ci-rate" placeholder="7" min="0" max="100" step="0.1" oninput="calcCompound()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Years</label>
+            <input class="form-input" type="number" id="ci-years" placeholder="10" min="1" max="50" step="1" oninput="calcCompound()">
+          </div>
+        </div>
+        <div id="ci-result"></div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title" style="margin-bottom:.35rem;">🛡️ Emergency Fund Calculator</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:1rem;">Experts recommend 3–6 months of expenses saved</div>
+        <div class="form-group">
+          <label class="form-label">Monthly Expenses ($)</label>
+          <input class="form-input" type="number" id="ef-monthly" placeholder="Auto-filled from your data" min="0" step="1" oninput="calcEmergency()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Months of Coverage</label>
+          <select class="form-input" id="ef-months" onchange="calcEmergency()">
+            <option value="3">3 months (minimum)</option>
+            <option value="4">4 months</option>
+            <option value="5">5 months</option>
+            <option value="6" selected>6 months (recommended)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Already Saved ($)</label>
+          <input class="form-input" type="number" id="ef-saved" placeholder="0" min="0" step="1" oninput="calcEmergency()">
+        </div>
+        <div id="ef-result"></div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title" style="margin-bottom:.35rem;">💳 Debt Payoff Calculator</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:1rem;">See how long until you're debt-free</div>
+        <div class="form-group">
+          <label class="form-label">Balance Owed ($)</label>
+          <input class="form-input" type="number" id="dp-balance" placeholder="5000" min="0" step="1" oninput="calcDebt()">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">APR (%)</label>
+            <input class="form-input" type="number" id="dp-rate" placeholder="20" min="0" max="100" step="0.1" oninput="calcDebt()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Monthly Payment ($)</label>
+            <input class="form-input" type="number" id="dp-payment" placeholder="150" min="0" step="1" oninput="calcDebt()">
+          </div>
+        </div>
+        <div id="dp-result"></div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title" style="margin-bottom:.35rem;">🎯 Savings Rate Goal</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:1rem;">How much should you be saving each month?</div>
+        <div class="form-group">
+          <label class="form-label">Monthly Income ($)</label>
+          <input class="form-input" type="number" id="sr-income" placeholder="Auto-filled from your data" min="0" step="1" oninput="calcSavings()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Savings Target</label>
+          <select class="form-input" id="sr-pct" onchange="calcSavings()">
+            <option value="10">10% — Getting started</option>
+            <option value="15">15% — Building momentum</option>
+            <option value="20" selected>20% — The 50/30/20 rule</option>
+            <option value="25">25% — Ahead of the curve</option>
+            <option value="30">30% — Aggressive saver</option>
+          </select>
+        </div>
+        <div id="sr-result"></div>
+      </div>
+
+    </div>
+
+    <!-- KEY CONCEPTS -->
+    <div class="sec-title" style="margin-bottom:1rem;">💡 Key Financial Concepts</div>
+    <div id="fl-concepts"></div>
+
   </section>
 
 </main>
@@ -644,7 +822,7 @@ function inMonth(tx, ym) {
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
-const TAB_ORDER = ['dashboard', 'transactions', 'budget', 'goals', 'splitter'];
+const TAB_ORDER = ['dashboard', 'transactions', 'budget', 'goals', 'splitter', 'learn'];
 
 function showTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -656,6 +834,7 @@ function showTab(id) {
   if (id === 'budget')       renderBudget();
   if (id === 'goals')        renderGoals();
   if (id === 'splitter')     renderSplitter();
+  if (id === 'learn')        renderLearn();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
@@ -1080,6 +1259,267 @@ function copyBsResults() {
     btn.textContent = '✅ Copied!';
     setTimeout(() => { btn.textContent = orig; }, 1800);
   }).catch(() => alert('Copy failed — please copy manually.'));
+}
+
+// ── FINANCIAL LITERACY ────────────────────────────────────────────────────────
+
+// Category buckets for 50/30/20
+const NEEDS_CATS = ['Housing','Health','Education','Transport'];
+const WANTS_CATS = ['Food','Entertainment','Shopping','Other'];
+
+function renderLearn() {
+  renderSnapshot();
+  autoFillLearn();
+  calcCompound();
+  calcEmergency();
+  calcDebt();
+  calcSavings();
+  renderConcepts();
+}
+
+// ── SNAPSHOT ──
+function renderSnapshot() {
+  const curMonth = new Date().toISOString().slice(0, 7);
+  const monthTx  = data.transactions.filter(t => inMonth(t, curMonth));
+  const income   = monthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const needs    = monthTx.filter(t => t.type === 'expense' && NEEDS_CATS.includes(t.category)).reduce((s, t) => s + t.amount, 0);
+  const wants    = monthTx.filter(t => t.type === 'expense' && WANTS_CATS.includes(t.category)).reduce((s, t) => s + t.amount, 0);
+  const totalExp = monthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const savings  = Math.max(income - totalExp, 0);
+
+  function snapshotCard(label, rule, target, actual, color, cats) {
+    const pct      = income > 0 ? Math.round((actual / income) * 100) : 0;
+    const barWidth = Math.min(pct, 100);
+    const onTrack  = pct <= target;
+    const fill     = onTrack ? 'var(--green)' : 'var(--red)';
+    const status   = income === 0
+      ? '<span style="color:var(--muted);">Add income transactions to see your snapshot</span>'
+      : onTrack
+        ? `<span style="color:var(--green-dark);">✅ On track (target ≤ ${target}%)</span>`
+        : `<span style="color:var(--red);">⚠️ Over target (${pct}% vs ${target}% target)</span>`;
+    return `<div class="fl-snapshot-card">
+      <div class="fl-snapshot-label">${label}</div>
+      <div class="fl-snapshot-rule">${rule}</div>
+      <div class="fl-snapshot-pcts">
+        <div class="fl-actual" style="color:${color}">${pct}%</div>
+        <div class="fl-target">of income · target ${label === 'Savings' ? '≥' : '≤'} ${target}%</div>
+      </div>
+      <div class="fl-bar-track"><div class="fl-bar-fill" style="width:${barWidth}%;background:${fill}"></div></div>
+      <div class="fl-status">${status}</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:.4rem;">${cats}</div>
+    </div>`;
+  }
+
+  document.getElementById('fl-snapshot').innerHTML =
+    snapshotCard('Needs',   'Target: 50% of income', 50, needs,   '#6366f1', 'Housing · Transport · Health · Education') +
+    snapshotCard('Wants',   'Target: 30% of income', 30, wants,   '#f59e0b', 'Food · Entertainment · Shopping · Other') +
+    snapshotCard('Savings', 'Target: 20% of income', 20, savings, '#16a34a', 'What\'s left after all expenses');
+}
+
+// ── AUTO-FILL from user data ──
+function autoFillLearn() {
+  const curMonth = new Date().toISOString().slice(0, 7);
+  const monthTx  = data.transactions.filter(t => inMonth(t, curMonth));
+  const income   = monthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const expense  = monthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  if (expense > 0 && !document.getElementById('ef-monthly').value)
+    document.getElementById('ef-monthly').value = Math.round(expense);
+  if (income > 0 && !document.getElementById('sr-income').value)
+    document.getElementById('sr-income').value = Math.round(income);
+}
+
+// ── COMPOUND INTEREST CALCULATOR ──
+function calcCompound() {
+  const P   = parseFloat(document.getElementById('ci-principal').value) || 0;
+  const pmt = parseFloat(document.getElementById('ci-monthly').value)   || 0;
+  const r   = (parseFloat(document.getElementById('ci-rate').value)     || 0) / 100 / 12;
+  const n   = parseInt(document.getElementById('ci-years').value)        || 0;
+  const el  = document.getElementById('ci-result');
+
+  if ((P === 0 && pmt === 0) || n === 0) { el.innerHTML = ''; return; }
+
+  const months   = n * 12;
+  let balance    = P;
+  for (let i = 0; i < months; i++) {
+    balance = balance * (1 + r) + pmt;
+  }
+  const contributed = P + pmt * months;
+  const interest    = balance - contributed;
+
+  el.innerHTML = `<div class="calc-result">
+    <div class="calc-result-main">${fmt(balance)}</div>
+    <div class="calc-result-sub">Final balance after ${n} year${n !== 1 ? 's' : ''}</div>
+    <div class="calc-result-row"><span>💵 Total contributed</span><span>${fmt(contributed)}</span></div>
+    <div class="calc-result-row"><span>📈 Interest earned</span><span style="color:var(--green-dark)">${fmt(interest)}</span></div>
+    <div class="calc-result-row"><span>🚀 Money multiplied</span><span>${contributed > 0 ? (balance / contributed).toFixed(2) + '×' : '—'}</span></div>
+  </div>`;
+}
+
+// ── EMERGENCY FUND CALCULATOR ──
+function calcEmergency() {
+  const monthly = parseFloat(document.getElementById('ef-monthly').value) || 0;
+  const months  = parseInt(document.getElementById('ef-months').value)    || 6;
+  const saved   = parseFloat(document.getElementById('ef-saved').value)   || 0;
+  const el      = document.getElementById('ef-result');
+
+  if (monthly === 0) { el.innerHTML = ''; return; }
+
+  const target    = monthly * months;
+  const remaining = Math.max(target - saved, 0);
+  const pct       = Math.min(Math.round((saved / target) * 100), 100);
+  const done      = saved >= target;
+
+  el.innerHTML = `<div class="calc-result" style="${done ? 'border-color:var(--green);' : ''}">
+    <div class="calc-result-main" style="${done ? 'color:var(--green-dark)' : ''}">${done ? '✅ ' : ''}${fmt(target)}</div>
+    <div class="calc-result-sub">Target fund size (${months} months)</div>
+    <div class="calc-result-row"><span>✅ Already saved</span><span>${fmt(saved)}</span></div>
+    <div class="calc-result-row"><span>🎯 Still needed</span><span style="color:${done ? 'var(--green-dark)' : 'var(--red)'}">${done ? 'Complete!' : fmt(remaining)}</span></div>
+    <div class="calc-result-row"><span>📊 Progress</span><span>${pct}%</span></div>
+  </div>`;
+}
+
+// ── DEBT PAYOFF CALCULATOR ──
+function calcDebt() {
+  const balance = parseFloat(document.getElementById('dp-balance').value) || 0;
+  const apr     = (parseFloat(document.getElementById('dp-rate').value)   || 0) / 100 / 12;
+  const payment = parseFloat(document.getElementById('dp-payment').value) || 0;
+  const el      = document.getElementById('dp-result');
+
+  if (balance === 0 || payment === 0) { el.innerHTML = ''; return; }
+
+  if (apr > 0 && payment <= balance * apr) {
+    el.innerHTML = `<div class="calc-result" style="border-color:var(--red);">
+      <div class="calc-result-main" style="color:var(--red);font-size:1rem;">Payment too low</div>
+      <div class="calc-result-sub">Your payment doesn't cover the monthly interest of ${fmt(balance * apr)}. Increase your payment.</div>
+    </div>`;
+    return;
+  }
+
+  let bal = balance, months = 0, totalPaid = 0;
+  while (bal > 0.01 && months < 600) {
+    const interest = bal * apr;
+    bal = bal + interest - payment;
+    totalPaid += payment;
+    months++;
+    if (bal < 0) { totalPaid += bal; bal = 0; }
+  }
+
+  const years  = Math.floor(months / 12);
+  const mo     = months % 12;
+  const timeStr = years > 0
+    ? `${years} yr${years !== 1 ? 's' : ''}${mo > 0 ? ` ${mo} mo` : ''}`
+    : `${months} month${months !== 1 ? 's' : ''}`;
+
+  el.innerHTML = `<div class="calc-result">
+    <div class="calc-result-main">${timeStr}</div>
+    <div class="calc-result-sub">Until debt-free</div>
+    <div class="calc-result-row"><span>💵 Total paid</span><span>${fmt(totalPaid)}</span></div>
+    <div class="calc-result-row"><span>🔥 Interest paid</span><span style="color:var(--red)">${fmt(totalPaid - balance)}</span></div>
+    <div class="calc-result-row"><span>💡 Interest %</span><span>${balance > 0 ? Math.round(((totalPaid - balance) / balance) * 100) + '%' : '—'}</span></div>
+  </div>`;
+}
+
+// ── SAVINGS RATE CALCULATOR ──
+function calcSavings() {
+  const income = parseFloat(document.getElementById('sr-income').value) || 0;
+  const pct    = parseFloat(document.getElementById('sr-pct').value)    || 20;
+  const el     = document.getElementById('sr-result');
+
+  if (income === 0) { el.innerHTML = ''; return; }
+
+  const target  = income * (pct / 100);
+  const yearly  = target * 12;
+  const in10yrs = target * 12 * 10;
+
+  el.innerHTML = `<div class="calc-result">
+    <div class="calc-result-main">${fmt(target)}</div>
+    <div class="calc-result-sub">To save per month at ${pct}%</div>
+    <div class="calc-result-row"><span>📅 Per year</span><span>${fmt(yearly)}</span></div>
+    <div class="calc-result-row"><span>🗓️ In 10 years (no interest)</span><span>${fmt(in10yrs)}</span></div>
+    <div class="calc-result-row"><span>💸 Left to spend</span><span>${fmt(income - target)}/mo</span></div>
+  </div>`;
+}
+
+// ── KEY CONCEPTS ──
+const CONCEPTS = [
+  {
+    title: '📊 The 50/30/20 Rule',
+    body: `<p>A simple budgeting framework popularized by Senator Elizabeth Warren:</p>
+    <ul>
+      <li><strong>50% Needs</strong> — rent, utilities, groceries, transport, insurance</li>
+      <li><strong>30% Wants</strong> — dining out, entertainment, subscriptions, shopping</li>
+      <li><strong>20% Savings</strong> — emergency fund, retirement, debt payoff</li>
+    </ul>
+    <div class="concept-highlight">It's a starting point, not a rule. High cost-of-living cities may require 60% on needs. Adjust from there.</div>`
+  },
+  {
+    title: '🛡️ The Emergency Fund',
+    body: `<p>Before investing, build a cash cushion that covers 3–6 months of living expenses in a high-yield savings account.</p>
+    <ul>
+      <li><strong>Why?</strong> A job loss, medical bill, or car repair won't force you into credit card debt</li>
+      <li><strong>Where?</strong> High-yield savings account — earns 4–5% and stays liquid</li>
+      <li><strong>How much?</strong> 3 months if your job is stable; 6 months if self-employed or variable income</li>
+    </ul>
+    <div class="concept-highlight">The emergency fund is insurance, not an investment. Keep it boring and accessible.</div>`
+  },
+  {
+    title: '📈 Compound Interest — The 8th Wonder',
+    body: `<p>Einstein allegedly called it "the eighth wonder of the world." Here's why:</p>
+    <ul>
+      <li>You earn interest on your interest — your money grows exponentially, not linearly</li>
+      <li>$200/month invested at 7% for 40 years = <strong>$525,000+</strong> — but you only contributed $96,000</li>
+      <li>The secret ingredient is <strong>time</strong> — starting at 22 beats starting at 32 by hundreds of thousands of dollars</li>
+    </ul>
+    <div class="concept-highlight">The best time to start investing was yesterday. The second best time is today.</div>`
+  },
+  {
+    title: '💳 Good Debt vs Bad Debt',
+    body: `<p>Not all debt is equal. The key question: <em>does this debt help you build wealth or drain it?</em></p>
+    <ul>
+      <li><strong>Good debt</strong> — low interest, builds an asset: mortgage, student loans (used wisely), business loans</li>
+      <li><strong>Bad debt</strong> — high interest, no asset: credit cards (20%+ APR), payday loans, car loans on depreciating vehicles</li>
+    </ul>
+    <div class="concept-highlight">Pay off high-interest debt before investing. Paying off a 20% APR credit card is a guaranteed 20% return.</div>`
+  },
+  {
+    title: '💡 Pay Yourself First',
+    body: `<p>Most people budget like this: earn → spend → save whatever's left. That "whatever's left" is usually $0.</p>
+    <p style="margin-top:.5rem;">The fix: <strong>automate your savings on payday before you can spend it.</strong></p>
+    <ul>
+      <li>Set up automatic transfer to savings/investments the day your paycheck hits</li>
+      <li>Budget and spend from what's left — you'll adapt</li>
+      <li>Even $50/month builds a habit that scales as your income grows</li>
+    </ul>
+    <div class="concept-highlight">You can't spend money that's already gone. Automate it and forget it.</div>`
+  },
+  {
+    title: '📦 Investing Basics — Index Funds',
+    body: `<p>You don't need to pick stocks. Most professional fund managers underperform the market. Here's the simple path:</p>
+    <ul>
+      <li><strong>Index funds</strong> — buy a tiny piece of every company in an index (S&P 500). Instant diversification.</li>
+      <li><strong>Low fees matter</strong> — a 1% fee vs 0.03% fee costs you tens of thousands over 30 years</li>
+      <li><strong>Time in market beats timing the market</strong> — consistent investing beats trying to buy dips</li>
+    </ul>
+    <div class="concept-highlight">Start with your employer's 401(k) match (free money), then a Roth IRA, then a brokerage account. In that order.</div>`
+  }
+];
+
+function renderConcepts() {
+  document.getElementById('fl-concepts').innerHTML = CONCEPTS.map((c, i) => `
+    <div class="concept-card">
+      <div class="concept-hdr" onclick="toggleConcept(${i})" id="chdr-${i}">
+        <div class="concept-title">${c.title}</div>
+        <div class="concept-icon">▼</div>
+      </div>
+      <div class="concept-body" id="cbody-${i}">${c.body}</div>
+    </div>`).join('');
+}
+
+function toggleConcept(i) {
+  const hdr  = document.getElementById(`chdr-${i}`);
+  const body = document.getElementById(`cbody-${i}`);
+  hdr.classList.toggle('open');
+  body.classList.toggle('open');
 }
 
 // ── KEYBOARD ──────────────────────────────────────────────────────────────────
