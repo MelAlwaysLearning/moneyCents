@@ -316,6 +316,58 @@ body {
 
 /* ── CONTRIB NOTE ── */
 .contrib-note { font-size:.85rem; color:var(--muted); margin-bottom:1rem; background:var(--surface2); padding:.65rem .9rem; border-radius:8px; }
+
+/* ── BILL SPLITTER ── */
+.bs-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media (max-width:680px) { .bs-grid { grid-template-columns:1fr; } }
+
+.bs-grand-box {
+  background: var(--surface2);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: .75rem;
+}
+.bs-grand-amt { font-size:1.5rem; font-weight:900; color:var(--green-dark); margin-left:.4rem; }
+
+.bs-person-row { display:flex; align-items:center; gap:.5rem; margin-bottom:.5rem; }
+.bs-name-input { flex:1; }
+
+.split-toggle { display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.split-btn {
+  flex:1;
+  padding: .38rem .75rem;
+  border: none;
+  background: #fff;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--muted);
+  transition: all .15s;
+}
+.split-btn.active { background:var(--green); color:#fff; }
+
+.bs-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .65rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: .5rem;
+}
+.bs-result-row:last-of-type { border-bottom:none; }
+.bs-result-name  { font-size:.9rem; font-weight:600; }
+.bs-result-amt   { font-size:1.05rem; font-weight:900; color:var(--green-dark); white-space:nowrap; }
+.bs-custom-input { width:100px; text-align:right; }
+
+.bs-remaining { margin-top:.75rem; padding:.5rem .75rem; border-radius:8px; font-size:.82rem; font-weight:600; }
+.bs-remaining.ok   { background:var(--green-pale); color:var(--green-dark); }
+.bs-remaining.warn { background:#fef3c7; color:#92400e; }
+.bs-remaining.over { background:var(--red-pale); color:var(--red); }
 </style>
 </head>
 <body>
@@ -332,6 +384,7 @@ body {
   <button class="nav-tab" onclick="showTab('transactions')">💳 Transactions</button>
   <button class="nav-tab" onclick="showTab('budget')">📋 Budget</button>
   <button class="nav-tab" onclick="showTab('goals')">🎯 Goals</button>
+  <button class="nav-tab" onclick="showTab('splitter')">🧾 Bill Splitter</button>
 </nav>
 
 <main class="app-main">
@@ -385,6 +438,65 @@ body {
       <button class="btn btn-green" onclick="openGoalModal()">+ New Goal</button>
     </div>
     <div id="goals-list"></div>
+  </section>
+
+  <!-- ════ BILL SPLITTER ════ -->
+  <section id="tab-splitter" class="tab-panel">
+    <div class="sec-hdr">
+      <div class="sec-title">Bill Splitter</div>
+      <button class="btn btn-ghost btn-sm" onclick="resetSplitter()">🔄 Reset</button>
+    </div>
+    <div class="bs-grid">
+
+      <!-- LEFT: setup -->
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="sec-title" style="margin-bottom:1rem;">Bill Details</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Bill Total ($)</label>
+              <input class="form-input" type="number" id="bs-total" placeholder="0.00" min="0" step="0.01" oninput="renderSplitter()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tip</label>
+              <select class="form-input" id="bs-tip" onchange="renderSplitter()">
+                <option value="0">No tip</option>
+                <option value="10">10%</option>
+                <option value="15" selected>15%</option>
+                <option value="18">18%</option>
+                <option value="20">20%</option>
+                <option value="25">25%</option>
+              </select>
+            </div>
+          </div>
+          <div class="bs-grand-box">Grand Total: <span id="bs-grand" class="bs-grand-amt">$0.00</span></div>
+        </div>
+
+        <div class="card">
+          <div class="sec-hdr">
+            <div class="sec-title">People</div>
+            <button class="btn btn-green btn-sm" onclick="addBsPerson()">+ Add Person</button>
+          </div>
+          <div id="bs-people"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: results -->
+      <div class="card">
+        <div class="sec-hdr">
+          <div class="sec-title">Split Results</div>
+          <div class="split-toggle">
+            <button class="split-btn active" id="split-equal-btn" onclick="setSplitMode('equal')">Equal</button>
+            <button class="split-btn"        id="split-custom-btn" onclick="setSplitMode('custom')">Custom</button>
+          </div>
+        </div>
+        <div id="bs-results"></div>
+        <div style="margin-top:1.25rem;">
+          <button class="btn btn-ghost" style="width:100%;" onclick="copyBsResults()">📋 Copy Results</button>
+        </div>
+      </div>
+
+    </div>
   </section>
 
 </main>
@@ -532,7 +644,7 @@ function inMonth(tx, ym) {
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
-const TAB_ORDER = ['dashboard', 'transactions', 'budget', 'goals'];
+const TAB_ORDER = ['dashboard', 'transactions', 'budget', 'goals', 'splitter'];
 
 function showTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -543,6 +655,7 @@ function showTab(id) {
   if (id === 'transactions') renderTransactions();
   if (id === 'budget')       renderBudget();
   if (id === 'goals')        renderGoals();
+  if (id === 'splitter')     renderSplitter();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
@@ -846,12 +959,136 @@ function saveContrib() {
   renderGoals();
 }
 
+// ── BILL SPLITTER ─────────────────────────────────────────────────────────────
+let bsPeople = [];
+let bsSplitMode = 'equal';
+let bsCustomAmts = {};
+
+function initSplitter() {
+  bsPeople = [{ id: genId(), name: 'Person 1' }, { id: genId(), name: 'Person 2' }];
+  bsSplitMode = 'equal';
+  bsCustomAmts = {};
+}
+
+function addBsPerson() {
+  bsPeople.push({ id: genId(), name: `Person ${bsPeople.length + 1}` });
+  renderSplitter();
+}
+
+function removeBsPerson(id) {
+  if (bsPeople.length <= 1) return;
+  bsPeople = bsPeople.filter(p => p.id !== id);
+  delete bsCustomAmts[id];
+  renderSplitter();
+}
+
+function setSplitMode(mode) {
+  bsSplitMode = mode;
+  document.getElementById('split-equal-btn').classList.toggle('active', mode === 'equal');
+  document.getElementById('split-custom-btn').classList.toggle('active', mode === 'custom');
+  renderSplitterResults(getBsGrand());
+}
+
+function getBsGrand() {
+  const total = parseFloat(document.getElementById('bs-total').value) || 0;
+  const tip   = parseFloat(document.getElementById('bs-tip').value)   || 0;
+  return parseFloat((total * (1 + tip / 100)).toFixed(2));
+}
+
+function renderSplitter() {
+  const grand = getBsGrand();
+  document.getElementById('bs-grand').textContent = fmt(grand);
+
+  document.getElementById('bs-people').innerHTML = bsPeople.map(p => `
+    <div class="bs-person-row">
+      <span>👤</span>
+      <input class="form-input bs-name-input" value="${p.name}" placeholder="Name"
+             onchange="(function(el){const px=bsPeople.find(q=>q.id==='${p.id}');if(px)px.name=el.value;renderSplitter();})(this)">
+      ${bsPeople.length > 1
+        ? `<button class="tx-del" onclick="removeBsPerson('${p.id}')" title="Remove">✕</button>`
+        : ''}
+    </div>`).join('');
+
+  renderSplitterResults(grand);
+}
+
+function renderSplitterResults(grand) {
+  const el = document.getElementById('bs-results');
+  const n  = bsPeople.length;
+
+  if (grand === 0) {
+    el.innerHTML = '<div class="empty"><div class="empty-text">Enter a bill amount to get started</div></div>';
+    return;
+  }
+  if (n === 0) {
+    el.innerHTML = '<div class="empty"><div class="empty-text">Add at least one person</div></div>';
+    return;
+  }
+
+  if (bsSplitMode === 'equal') {
+    const share = grand / n;
+    el.innerHTML = bsPeople.map(p => `
+      <div class="bs-result-row">
+        <div class="bs-result-name">👤 ${p.name}</div>
+        <div class="bs-result-amt">${fmt(share)}</div>
+      </div>`).join('');
+  } else {
+    const rows = bsPeople.map(p => `
+      <div class="bs-result-row">
+        <div class="bs-result-name">👤 ${p.name}</div>
+        <input class="form-input bs-custom-input" type="number" step="0.01" min="0"
+               value="${bsCustomAmts[p.id] || ''}" placeholder="0.00"
+               oninput="bsCustomAmts['${p.id}']=parseFloat(this.value)||0;renderSplitterResults(${grand});">
+      </div>`).join('');
+
+    const allocated = bsPeople.reduce((s, p) => s + (bsCustomAmts[p.id] || 0), 0);
+    const remaining = parseFloat((grand - allocated).toFixed(2));
+    const statusClass = Math.abs(remaining) <= 0.01 ? 'ok' : remaining > 0 ? 'warn' : 'over';
+    const statusText  = Math.abs(remaining) <= 0.01
+      ? '✅ Fully allocated'
+      : remaining > 0
+        ? `${fmt(remaining)} left to allocate`
+        : `⚠️ Over by ${fmt(-remaining)}`;
+
+    el.innerHTML = rows + `<div class="bs-remaining ${statusClass}">${statusText}</div>`;
+  }
+}
+
+function resetSplitter() {
+  document.getElementById('bs-total').value = '';
+  document.getElementById('bs-tip').value   = '15';
+  initSplitter();
+  document.getElementById('split-equal-btn').classList.add('active');
+  document.getElementById('split-custom-btn').classList.remove('active');
+  renderSplitter();
+}
+
+function copyBsResults() {
+  const grand = getBsGrand();
+  if (grand === 0) { alert('Enter a bill amount first.'); return; }
+  const n = bsPeople.length;
+  let text = `moneyCents — Bill Split\nTotal: ${fmt(grand)}\n\n`;
+  if (bsSplitMode === 'equal') {
+    const share = grand / n;
+    bsPeople.forEach(p => { text += `${p.name}: ${fmt(share)}\n`; });
+  } else {
+    bsPeople.forEach(p => { text += `${p.name}: ${fmt(bsCustomAmts[p.id] || 0)}\n`; });
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('[onclick="copyBsResults()"]');
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  }).catch(() => alert('Copy failed — please copy manually.'));
+}
+
 // ── KEYBOARD ──────────────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeTxModal(); closeGoalModal(); closeContribModal(); }
 });
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+initSplitter();
 renderDashboard();
 </script>
 </body>
